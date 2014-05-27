@@ -1,0 +1,25 @@
+{
+  "name": "offload",
+  "version": "0.0.0",
+  "description": "offload CPU intensive tasks with a POST",
+  "main": "index.js",
+  "dependencies": {
+    "koa": "~0.6.1"
+  },
+  "devDependencies": {
+    "mocha": "~1.19.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/socialtables/offload.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/socialtables/offload/issues"
+  },
+  "homepage": "https://github.com/socialtables/offload"
+}
