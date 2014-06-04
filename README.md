@@ -2,16 +2,40 @@
 
 Offload CPU intensive tasks with a POST
 
-## Usage
+## Running
+
+```
+nvm use 0.11.*
+node --harmony app.js
+```
+
+## app.js
 
 ```
 var offload = require("offload");
+var app = offload();
 
-offload.access = function*(ctx){
-	
-}
+app.job("list-all", {cmd:"ls", args:["-l", "-a"]});
 
-offload.job("ksjdfladsjfasd", "jlkdjfalsdk;fa");
+app.permitPost(function*(next){
+	var permit = true;
+	if(permit){
+		yield next;
+	}
+	else{
+		this.status=401;
+	}
+});
 
-offload.listen(3000);
+app.permitGet(function*(next){
+	var permit = true;
+	if(permit){
+		yield next;
+	}
+	else{
+		this.status=401;
+	}
+});
+
+module.exports = app.listen();
 ```

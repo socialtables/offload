@@ -56,6 +56,23 @@ describe("POST to", function(){
 				data.text.should.equal(hash);
 			}));
 		});
+
+	});
+
+	describe("an invalid job", function(){
+		it.skip("whose command cannot run", function(done){
+			// this test is currently being skipped because I've yet to find a good way
+			// to capture the ENOENT error thrown by spawn when calling unknown files
+			req.post("/jobs/cla-not-installed").end(asyncTester(done, function(data){
+				console.log(data.statusCode, data.text);
+			}));
+		});
+
+		it("that is not assigned", function(done){
+			req.post("/jobs/not-assigned").end(asyncTester(done, function(data){
+				data.statusCode.should.equal(404);
+			}));
+		});
 	});
 
 	it("should get 500 on a job fail", function(done){

@@ -39,7 +39,7 @@ module.exports = function(permitPost, permitGet){
 		var job = config.jobs[jobId];
 		if(job==undefined){
 			debug("invalid job id");
-			this.statsCode = 404;
+			this.status = 404;
 			this.body = {error:"Invalid Job Id"};
 		}
 		else{
@@ -109,8 +109,9 @@ module.exports = function(permitPost, permitGet){
 			debug("job error", ctx.params.job);
 			ctx.status = 500;
 			ctx.body = "Job Error";
-			console.log("MSG", err.message);
-			console.log(err.stack);
+			if(process.env.NODE_ENV!=="test"){
+				console.log(err);
+			}
 			ctx.job.stats.error++;
 		}
 		ctx.job.stats.running--;
@@ -124,9 +125,10 @@ module.exports = function(permitPost, permitGet){
 	 * 	permitGet: another way to setup permissions...
 	 *  job: regiesters a job with offload
 	 * 		name: the jobs id, aka name
-	 * 		cmd: the cmd to be run
-	 *		args: (optional) array of args for cmd
-	 *		env: (optional) object of env vars. Default: process.env
+	 * 		opts:
+	 *			cmd: the cmd to be run
+	 *			args: (optional) array of args for cmd
+	 *			env: not implemented as it throws an ENOENT error for files that are present...
 	 */
 
 	return {
@@ -142,13 +144,22 @@ module.exports = function(permitPost, permitGet){
 			debug("setting permit get");
 			config.permitGet = gen;
 		},
-		job: function(name, cmd, args, env){
+		job: function(name, opts){
 
-			args = args || [];
-			env = env || process.env;
+			if(typeof opts != "object"){
+				throw new Error("Must provide opts to define a job");
+			}
 
-			if(typeof env != "object"){
-				throw new Error("Invalid `env` argument. Must be an object");
+			var cmd = opts.cmd;
+			var args = opts.args || [];
+			//var env = opts.env || process.env;
+
+			if(typeof cmd != "string"){
+				throw new Error("opts.cmd is required and must be a string");
+			}
+
+			if(Object.prototype.toString.call( args ) !== '[object Array]'){
+				throw new Error("opts.args must either be not provided to be an array");
 			}
 
 			debug("adding new job", name, "to offload running", cmd, args.join(" "));
@@ -159,7 +170,7 @@ module.exports = function(permitPost, permitGet){
 				config.jobs[name] = {
 					cmd: cmd,
 					args: args,
-					end: env,
+					env: process.env,
 					stats: {
 						running: 0,
 						done: 0,
