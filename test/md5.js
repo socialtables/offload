@@ -1,7 +1,7 @@
 var crypto = require('crypto');
 var md5sum = crypto.createHash('md5');
 
-var input = require("../read-input");
+var input = require("stdin");
 
 input(function(data){
 	md5sum.update(data);

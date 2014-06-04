@@ -13,7 +13,7 @@
   "devDependencies": {
     "mocha": "~1.20.0",
     "supertest": "~0.13.0",
-    "thunkify": "~2.1.2",
+    "stdin": "0.0.1",
     "should": "~4.0.0"
   },
   "scripts": {
