@@ -102,16 +102,14 @@ module.exports = function(permitPost, permitGet){
 			// TODO: make this less 
 			var body = (yield rawBody(ctx.req)).toString();
 			ctx.body = yield runner(ctx.job.cmd, ctx.job.args, ctx.job.env, body);
+
 			debug("job success", ctx.params.job);
 			ctx.job.stats.done++;
 		}
 		catch(err){
-			debug("job error", ctx.params.job);
+			debug("job error", ctx.params.job, err);
 			ctx.status = 500;
 			ctx.body = "Job Error";
-			if(process.env.NODE_ENV!=="test"){
-				console.log(err);
-			}
 			ctx.job.stats.error++;
 		}
 		ctx.job.stats.running--;
