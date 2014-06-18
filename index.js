@@ -100,6 +100,7 @@ module.exports = function(permitPost, permitGet){
 		debug("starting", this.params.job);
 		var ctx = this; //doing this so we can still access it inside the catch block
 		ctx.job.stats.running++;
+		var start = Date.now();
 		try{
 			// TODO: make this work as a stream...
 			// TODO: make this less 
@@ -116,7 +117,11 @@ module.exports = function(permitPost, permitGet){
 			ctx.body = "Job Error";
 			ctx.job.stats.error++;
 		}
+		var end = Date.now();
 		ctx.job.stats.running--;
+		var time = end - start;
+		debug("job", ctx.params.job, "run time", time)
+		ctx.job.stats.runTime += time;
 	});
 
 	/**
@@ -127,11 +132,12 @@ module.exports = function(permitPost, permitGet){
 	 * 	permitGet: another way to setup permissions...
 	 *  job: regiesters a job with offload
 	 * 		name: the jobs id, aka name
-	 * 		opts:
+	 * 		opts: //spawn
 	 *			cmd: the cmd to be run
 	 *			args: (optional) array of args for cmd
 	 *			env: not implemented as it throws an ENOENT error for files that are present...
-	 *		opts: fn(body, cb)
+	 *		opts: fn(body, cb){ cb(null, body); } //callback
+	 *		opts: fn*(body){ return body }; //gen
 	 */
 
 	return {
@@ -194,7 +200,8 @@ module.exports = function(permitPost, permitGet){
 					stats: {
 						running: 0,
 						done: 0,
-						error: 0
+						error: 0,
+						runTime: 0
 					}
 				}
 			}
