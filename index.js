@@ -127,6 +127,8 @@ module.exports = function(permitPost, permitGet){
 	/**
 	 * Exposed API
 	 * params
+	 * 	get: exposes the get router
+	 * 	stats(job): provides the stats for job
 	 *	listen: binds offload to a port
 	 *	permitPost: another way to setup permissions...
 	 * 	permitGet: another way to setup permissions...
@@ -141,6 +143,16 @@ module.exports = function(permitPost, permitGet){
 	 */
 
 	return {
+		get: app.get,
+		stats: function(jobId){
+			var job = config.jobs[jobId];
+			if(job){
+				return job.stats;
+			}
+			else{
+				return null;
+			}
+		},
 		listen: function(port){
 			debug("listening on "+port);
 			return app.listen(port);
