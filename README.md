@@ -15,8 +15,25 @@ node --harmony app.js
 var offload = require("offload");
 var app = offload();
 
+// Spawn process job
 app.job("list-all", {cmd:"ls", args:["-l", "-a"]});
 
+// Callback job
+app.job("callback-job", function(body, cb){
+	cb(null, body);
+});
+
+// Generator function job
+app.job("gen-job", function*(body){
+	return body;
+});
+
+// Custom route hosting the stats for gen-job
+app.get("/custom-route", function*(){
+	this.body = app.stats("gen-job");
+});
+
+// Permission handling for all STANDARD route POST requests.
 app.permitPost(function*(next){
 	var permit = true;
 	if(permit){
@@ -27,6 +44,8 @@ app.permitPost(function*(next){
 	}
 });
 
+// Permission handling for all STANDARD route GET requests.
+// This does not apply to anything created via app.get
 app.permitGet(function*(next){
 	var permit = true;
 	if(permit){
@@ -37,5 +56,5 @@ app.permitGet(function*(next){
 	}
 });
 
-module.exports = app.listen();
+module.exports = app.listen(3000);
 ```
