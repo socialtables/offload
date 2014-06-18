@@ -168,11 +168,20 @@ module.exports = function(permitPost, permitGet){
 					}
 				}
 			}
+			else if(typeof opts == "function" && 'GeneratorFunction' == opts.constructor.name){
+				var fn = opts;
+			}
+			else if(typeof opts == "function"){
+				var thunk = thunkify(opts);
+				var fn = function(body){
+					return thunk(body);
+				}
+			}
 			else{
 				throw new Error("Invalid data provided to job");
 			}
 
-			debug("adding new job", name, "to offload running", cmd, args.join(" "));
+			debug("adding new job", name, "to offload");
 			if(config.jobs[name]){
 				throw new Error("Job "+name+" is already defined");
 			}
