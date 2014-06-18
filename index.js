@@ -2,6 +2,7 @@ var koa = require("koa");
 var router = require("koa-router");
 var debug = require("debug")("offload");
 var runner = require("./lib/runner");
+var thunkify = require("thunkify");
 var rawBody = require("raw-body");
 
 module.exports = function(permitPost, permitGet){
@@ -104,7 +105,7 @@ module.exports = function(permitPost, permitGet){
 			// TODO: make this less 
 			var body = (yield rawBody(ctx.req)).toString();
 
-			ctx.body = yield runner(ctx.job.cmd, ctx.job.args, body);
+			ctx.body = yield ctx.job.fn(body);
 
 			debug("job success", ctx.params.job);
 			ctx.job.stats.done++;
@@ -130,6 +131,7 @@ module.exports = function(permitPost, permitGet){
 	 *			cmd: the cmd to be run
 	 *			args: (optional) array of args for cmd
 	 *			env: not implemented as it throws an ENOENT error for files that are present...
+	 *		opts: fn(body, cb)
 	 */
 
 	return {
@@ -147,29 +149,39 @@ module.exports = function(permitPost, permitGet){
 		},
 		job: function(name, opts){
 
-			if(typeof opts != "object"){
-				throw new Error("Must provide opts to define a job");
+			var fn = null;
+			if(typeof opts == "object"){
+
+				var cmd = opts.cmd;
+				var args = opts.args || [];
+
+				if(typeof cmd != "string"){
+					throw new Error("opts.cmd is required and must be a string");
+				}
+				else if(Object.prototype.toString.call( args ) !== '[object Array]'){
+					throw new Error("opts.args must either be not provided to be an array");
+				}
+				else{
+
+					var fn = function(body){
+						return runner(cmd, args, body);
+					}
+				}
 			}
-
-			var cmd = opts.cmd;
-			var args = opts.args || [];
-
-			if(typeof cmd != "string"){
-				throw new Error("opts.cmd is required and must be a string");
-			}
-
-			if(Object.prototype.toString.call( args ) !== '[object Array]'){
-				throw new Error("opts.args must either be not provided to be an array");
+			else{
+				throw new Error("Invalid data provided to job");
 			}
 
 			debug("adding new job", name, "to offload running", cmd, args.join(" "));
 			if(config.jobs[name]){
 				throw new Error("Job "+name+" is already defined");
 			}
+			else if(fn===null){
+				throw new Error("Unable to setup job...");
+			}
 			else{
 				config.jobs[name] = {
-					cmd: cmd,
-					args: args,
+					fn: fn,
 					stats: {
 						running: 0,
 						done: 0,
