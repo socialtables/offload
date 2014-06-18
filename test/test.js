@@ -20,21 +20,22 @@ function asyncTester(done, fn){
 	}
 }
 
-describe("GET from", function(){
-	describe("a valid job", function(){
-		it("should return data", function(done){
-			req.get("/jobs/good-exit").end(asyncTester(done, function(data){
-				data.body.should.have.property("id", "good-exit");
-				data.body.should.have.property("stats");
-				data.body.stats.should.have.property("running");
-				data.body.stats.should.have.property("done");
-				data.body.stats.should.have.property("error");
-			}));
-		});
+describe("GET /jobs", function(){
+	it("should return data", function(done){
+		req.get("/jobs").end(asyncTester(done, function(data){
+			data.body.should.have.property("md5");
+			var jobKeys = Object.keys(data.body);
+			for(var i=0; i<jobKeys.length; i++){
+				var jobKey = jobKeys[i];
+				data.body[jobKey].should.have.property("running");
+				data.body[jobKey].should.have.property("done");
+				data.body[jobKey].should.have.property("error");
+			}
+		}));
 	});
 
 	it("should run permitGet", function(done){
-		req.get("/jobs/good-exit").end(asyncTester(done, function(data){
+		req.get("/jobs").end(asyncTester(done, function(data){
 			data.headers.should.have.property("permit-process", "get");
 		}));
 	});

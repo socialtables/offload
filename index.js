@@ -75,16 +75,18 @@ module.exports = function(permitPost, permitGet){
 
 	app.use(router(app));
 
+
 	/**
-	 * Get basic info about a job
+	 * Get basic stats about all jobs
 	 */
 
-	app.get("/jobs/:job", checkPermitGet, checkJob, function*(){
-		debug("getting info about", this.params.job);
-		this.body = {
-			id: this.params.job,
-			stats: this.job.stats
-		}
+	app.get("/jobs", checkPermitGet, function*(){
+		debug("getting info about all jobs");
+		var data = {};
+		Object.keys(config.jobs).map(function(j){
+			data[j] = config.jobs[j].stats;
+		});
+		this.body = data;
 	});
 
 	/**
@@ -101,7 +103,8 @@ module.exports = function(permitPost, permitGet){
 			// TODO: make this work as a stream...
 			// TODO: make this less 
 			var body = (yield rawBody(ctx.req)).toString();
-			ctx.body = yield runner(ctx.job.cmd, ctx.job.args, ctx.job.env, body);
+
+			ctx.body = yield runner(ctx.job.cmd, ctx.job.args, body);
 
 			debug("job success", ctx.params.job);
 			ctx.job.stats.done++;
@@ -150,7 +153,6 @@ module.exports = function(permitPost, permitGet){
 
 			var cmd = opts.cmd;
 			var args = opts.args || [];
-			//var env = opts.env || process.env;
 
 			if(typeof cmd != "string"){
 				throw new Error("opts.cmd is required and must be a string");
@@ -168,7 +170,6 @@ module.exports = function(permitPost, permitGet){
 				config.jobs[name] = {
 					cmd: cmd,
 					args: args,
-					env: process.env,
 					stats: {
 						running: 0,
 						done: 0,

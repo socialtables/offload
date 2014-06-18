@@ -16,4 +16,4 @@ app.permitGet(function*(next){
 	yield next;
 });
 
-module.exports = app.listen();
+module.exports = app.listen(process.env.NODE_PORT || undefined);
