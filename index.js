@@ -144,6 +144,9 @@ module.exports = function(permitPost, permitGet){
 
 	return {
 		get: app.get,
+		jobs: function(){
+			return Object.keys(config.jobs);
+		},
 		stats: function(jobId){
 			var job = config.jobs[jobId];
 			if(job){
