@@ -20,6 +20,20 @@ function asyncTester(done, fn){
 	}
 }
 
+describe("runner", function() {
+	var runner = require("../lib/runner");
+	it("should run with a workspace which is auto-cleaned-up", function(done) {
+		runner("./test/env-test.js", [], "")(function(err, result) {
+			if (err) {
+				done(new Error("OFFLOAD_WORKSPACE not found or invalid"));
+			}
+			else {
+				done();
+			}
+		});
+	});
+});
+
 describe("GET", function(){
 	describe("/jobs", function(){
 		it("should return data", function(done){
