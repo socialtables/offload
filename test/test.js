@@ -1,4 +1,5 @@
-var crypto = require('crypto');
+var fs = require("fs");
+var crypto = require("crypto");
 
 var server = require("./app.js");
 var req = require("supertest")(server);
@@ -28,7 +29,14 @@ describe("runner", function() {
 				done(new Error("OFFLOAD_WORKSPACE not found or invalid"));
 			}
 			else {
-				done();
+				// verify that the workspace is no longer present -- the path
+				// is returned from the test script
+				if (fs.existsSync(result)) {
+					done(new Error("Workspace " + result + " still present!"));
+				}
+				else {
+					done();
+				}
 			}
 		});
 	});

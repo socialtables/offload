@@ -9,11 +9,10 @@ var input = require("stdin");
 input(function(data){
 	if (process.env.OFFLOAD_WORKSPACE &&
 			fs.existsSync(process.env.OFFLOAD_WORKSPACE)) {
-		process.stdout.write("1");
+		process.stdout.write(process.env.OFFLOAD_WORKSPACE);
 		process.exit();
 	}
 	else {
-		process.stdout.write("-1");
 		process.exit(1);
 	}
 });
