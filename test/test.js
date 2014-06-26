@@ -1,4 +1,5 @@
-var crypto = require('crypto');
+var fs = require("fs");
+var crypto = require("crypto");
 
 var server = require("./app.js");
 var req = require("supertest")(server);
@@ -19,6 +20,27 @@ function asyncTester(done, fn){
 		}
 	}
 }
+
+describe("runner", function() {
+	var runner = require("../lib/runner");
+	it("should run with a workspace which is auto-cleaned-up", function(done) {
+		runner("./test/env-test.js", [], "")(function(err, result) {
+			if (err) {
+				done(new Error("OFFLOAD_WORKSPACE not found or invalid"));
+			}
+			else {
+				// verify that the workspace is no longer present -- the path
+				// is returned from the test script
+				if (fs.existsSync(result)) {
+					done(new Error("Workspace " + result + " still present!"));
+				}
+				else {
+					done();
+				}
+			}
+		});
+	});
+});
 
 describe("GET", function(){
 	describe("/jobs", function(){

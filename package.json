@@ -4,11 +4,13 @@
   "description": "offload CPU intensive tasks with a POST",
   "main": "index.js",
   "dependencies": {
+    "debug": "~0.8.1",
     "koa": "~0.6.1",
     "koa-router": "~3.1.4",
-    "debug": "~0.8.1",
     "raw-body": "~1.1.6",
-    "thunkify": "~2.1.2"
+    "rimraf": "^2.2.8",
+    "thunkify": "~2.1.2",
+    "uuid": "^1.4.1"
   },
   "devDependencies": {
     "mocha": "~1.20.0",
