@@ -123,7 +123,7 @@ module.exports = function(permitPost, permitGet){
 			ctx.body = yield ctx.job.fn.call(ctx, body);
 
 			debug("job success", ctx.params.job);
-			ctx.job.stats.done++;
+			ctx.job.stats.success++;
 		}
 		catch(err){
 			debug("job error", ctx.params.job, err);
@@ -231,7 +231,7 @@ module.exports = function(permitPost, permitGet){
 					fn: fn,
 					stats: {
 						running: 0,
-						done: 0,
+						success: 0,
 						error: 0,
 						runTime: 0
 					}
