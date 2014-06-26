@@ -33,3 +33,4 @@ app.permitGet(function*(next){
 });
 
 module.exports = app.listen(process.env.NODE_PORT || undefined);
+module.exports.on = app.on;

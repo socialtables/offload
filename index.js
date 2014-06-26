@@ -11,6 +11,8 @@ var fs = require("fs");
 var uuid = require("uuid");
 var path = require("path");
 
+var emitter = new (require("events").EventEmitter)();
+
 
 module.exports = function(permitPost, permitGet){
 
@@ -130,6 +132,7 @@ module.exports = function(permitPost, permitGet){
 			ctx.status = 500;
 			ctx.body = "Job Error";
 			ctx.job.stats.error++;
+			emitter.emit("500", {job:this.params.job, data:body, err:err});
 		}
 		var end = Date.now();
 		ctx.job.stats.running--;
@@ -160,6 +163,9 @@ module.exports = function(permitPost, permitGet){
 	 */
 
 	return {
+		on: function(e, fn){
+			emitter.on(e, fn);
+		},
 		get: app.get,
 		jobs: function(){
 			return Object.keys(config.jobs);

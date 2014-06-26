@@ -100,6 +100,27 @@ describe("POST to", function(){
 			}));
 		});
 
+		it("should emit and error event on a job fail", function(done){
+			var error = null;
+			server.on("500", function(msg){
+				error = msg;
+			});
+
+			var body = {name:"name"};
+			req.post("/jobs/bad-exit").send(body).expect(500).end(asyncTester(done, function(data){
+				if(error===null){
+					throw new Error("error event was never trigged");
+				}
+				else{
+					error.should.have.property("job", "bad-exit");
+					error.should.have.property("data", JSON.stringify(body));
+					error.should.have.property("err");
+					error.err.should.have.property("cmd", "node");
+					error.err.should.have.property("error", "err");
+				}
+			}));
+		});
+
 		it("should run permitPost", function(done){
 			req.post("/jobs/good-exit").end(asyncTester(done, function(data){
 				data.headers.should.have.property("permit-process", "post");
