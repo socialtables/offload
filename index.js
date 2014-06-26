@@ -5,6 +5,13 @@ var runner = require("./lib/runner");
 var thunkify = require("thunkify");
 var rawBody = require("raw-body");
 
+var rimraf = require("rimraf");
+var os = require("os");
+var fs = require("fs");
+var uuid = require("uuid");
+var path = require("path");
+
+
 module.exports = function(permitPost, permitGet){
 
 	/**
@@ -100,13 +107,20 @@ module.exports = function(permitPost, permitGet){
 		debug("starting", this.params.job);
 		var ctx = this; //doing this so we can still access it inside the catch block
 		ctx.job.stats.running++;
+		
+		// create a temporary dir for workspace, and
+		// push that into the child process' environment
+		var workspaceDir = path.join(os.tmpdir(), uuid.v4());
+		fs.mkdirSync(workspaceDir);
+		ctx.workspace = workspaceDir;
+
 		var start = Date.now();
 		try{
 			// TODO: make this work as a stream...
 			// TODO: make this less 
 			var body = (yield rawBody(ctx.req)).toString();
 
-			ctx.body = yield ctx.job.fn(body);
+			ctx.body = yield ctx.job.fn.call(ctx, body);
 
 			debug("job success", ctx.params.job);
 			ctx.job.stats.done++;
@@ -122,6 +136,9 @@ module.exports = function(permitPost, permitGet){
 		var time = end - start;
 		debug("job", ctx.params.job, "run time", time)
 		ctx.job.stats.runTime += time;
+
+		// nuke the workspace
+		rimraf.sync(workspaceDir);
 	});
 
 	/**
@@ -185,7 +202,7 @@ module.exports = function(permitPost, permitGet){
 				else{
 
 					var fn = function(body){
-						return runner(cmd, args, body);
+						return runner.call(this, cmd, args, body);
 					}
 				}
 			}
