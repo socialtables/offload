@@ -12,7 +12,12 @@ input(function(data){
 		process.stdout.write(process.env.OFFLOAD_WORKSPACE);
 		process.exit();
 	}
+	else if(process.env.OFFLOAD_WORKSPACE === undefined){
+		console.error("OFFLOAD_WORKSPACE is not defined");
+		process.exit(1);
+	}
 	else {
+		console.error("OFFLOAD_WORKSPACE value does not exist", process.env.OFFLOAD_WORKSPACE);
 		process.exit(1);
 	}
 });

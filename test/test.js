@@ -21,25 +21,32 @@ function asyncTester(done, fn){
 	}
 }
 
-describe("runner", function() {
-	var runner = require("../lib/runner");
-	it("should run with a workspace which is auto-cleaned-up", function(done) {
-		runner("./test/env-test.js", [], "")(function(err, result) {
-			if (err) {
-				done(new Error("OFFLOAD_WORKSPACE not found or invalid"));
-			}
-			else {
-				// verify that the workspace is no longer present -- the path
-				// is returned from the test script
-				if (fs.existsSync(result)) {
-					done(new Error("Workspace " + result + " still present!"));
-				}
-				else {
-					done();
-				}
+describe("JOB ENV", function(){
+
+	describe("with a cmd job", function(){
+		var workspace_data = {
+			path: null,
+			code: null
+		}
+
+		before(function(done){
+			req.post("/jobs/env-test").end(asyncTester(done, function(data){
+				workspace_data.path = data.text;
+				workspace_data.code = data.statusCode;
+			}));
+		});
+
+		it("should have OFFLOAD_WORKSPACE", function(){
+			workspace_data.code.should.equal(200);
+		});
+
+		it("should clean up its OFFLOAD_WORKSPACE", function(){
+			if (fs.existsSync(workspace_data.path)) {
+				throw new Error("Workspace " + result + " still present!");
 			}
 		});
 	});
+
 });
 
 describe("GET", function(){
@@ -51,7 +58,7 @@ describe("GET", function(){
 				for(var i=0; i<jobKeys.length; i++){
 					var jobKey = jobKeys[i];
 					data.body[jobKey].should.have.property("running");
-					data.body[jobKey].should.have.property("done");
+					data.body[jobKey].should.have.property("success");
 					data.body[jobKey].should.have.property("error");
 				}
 			}));

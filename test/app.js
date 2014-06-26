@@ -20,6 +20,8 @@ app.job("gen", function*(body){
 	return yield coPause(body);
 });
 
+app.job("env-test", {cmd:"node", args:["./test/env-test.js"]});
+
 app.permitPost(function*(next){
 	this.set("permit-process", "post");
 	yield next;
