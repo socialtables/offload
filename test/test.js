@@ -47,6 +47,30 @@ describe("JOB ENV", function(){
 		});
 	});
 
+	describe("with a callback job", function(){
+		var workspace_data = {
+			path: null,
+			code: null
+		}
+
+		before(function(done){
+			req.post("/jobs/env-test-cb").end(asyncTester(done, function(data){
+				workspace_data.path = data.text;
+				workspace_data.code = data.statusCode;
+			}));
+		});
+
+		it("should have this.workspace", function(){
+			workspace_data.code.should.equal(200);
+		});
+
+		it("should clean up its this.workspace", function(){
+			if (fs.existsSync(workspace_data.path)) {
+				throw new Error("Workspace " + result + " still present!");
+			}
+		});
+	});
+
 });
 
 describe("GET", function(){

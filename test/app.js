@@ -1,6 +1,7 @@
 var thunkify = require("thunkify");
 var offload = require("../index");
 var app = offload();
+var fs = require("fs");
 
 var pause = function(msg, cb){
 	setTimeout(function(){
@@ -21,6 +22,20 @@ app.job("gen", function*(body){
 });
 
 app.job("env-test", {cmd:"node", args:["./test/env-test.js"]});
+
+app.job("env-test-cb", function(body, cb){
+	if (this.workspace &&
+			fs.existsSync(this.workspace)) {
+		process.stdout.write(this.workspace);
+		cb(null, this.workspace);
+	}
+	else if(this.workspace === undefined){
+		cb(new Error("this.workspace is not defined"));
+	}
+	else {
+		cb(null, "this.workspace value does not exist: "+ this.workspace);
+	}
+});
 
 app.permitPost(function*(next){
 	this.set("permit-process", "post");

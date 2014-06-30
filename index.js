@@ -218,7 +218,7 @@ module.exports = function(permitPost, permitGet){
 			else if(typeof opts == "function"){
 				var thunk = thunkify(opts);
 				var fn = function(body){
-					return thunk(body);
+					return thunk.call(this, body);
 				}
 			}
 			else{
