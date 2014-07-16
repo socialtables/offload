@@ -42,7 +42,7 @@ describe("JOB ENV", function(){
 
 		it("should clean up its OFFLOAD_WORKSPACE", function(){
 			if (fs.existsSync(workspace_data.path)) {
-				throw new Error("Workspace " + result + " still present!");
+				throw new Error("Workspace " + workspace_data.path + " still present!");
 			}
 		});
 	});
@@ -66,7 +66,7 @@ describe("JOB ENV", function(){
 
 		it("should clean up its this.workspace", function(){
 			if (fs.existsSync(workspace_data.path)) {
-				throw new Error("Workspace " + result + " still present!");
+				throw new Error("Workspace " + workspace_data.path + " still present!");
 			}
 		});
 	});
