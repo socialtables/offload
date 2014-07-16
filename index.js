@@ -141,7 +141,15 @@ module.exports = function(permitPost, permitGet){
 		ctx.job.stats.runTime += time;
 
 		// nuke the workspace
-		rimraf.sync(workspaceDir);
+		rimraf(workspaceDir, function(err){
+			if(err){
+				debug("error removing workspace dir", workspaceDir);
+				emitter.emit("workspace_dir_rm_error", workspaceDir);
+			}
+			else{
+				debug("workspace dir removed", workspaceDir);
+			}
+		});
 	});
 
 	/**
