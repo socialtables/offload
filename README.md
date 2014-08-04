@@ -58,3 +58,10 @@ app.permitGet(function*(next){
 
 module.exports = app.listen(3000);
 ```
+
+## Cleanup
+
+In general, `offload` jobs have to clean up after themselves -- however,
+`offload` does provide a temporary directory as a workspace. This is the
+`OFFLOAD_WORKSPACE` environment variable for jobs spawned as separate processes,
+or `this.workspace` for jobs implemented as Javascript functions.
