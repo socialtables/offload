@@ -61,7 +61,13 @@ module.exports = app.listen(3000);
 
 ## Cleanup
 
-In general, `offload` jobs have to clean up after themselves -- however,
-`offload` does provide a temporary directory as a workspace. This is the
-`OFFLOAD_WORKSPACE` environment variable for jobs spawned as separate processes,
-or `this.workspace` for jobs implemented as Javascript functions.
+In general, `offload` jobs have to clean up after themselves -- which is to say
+any resources used by a job should be disposed of by the job itself. There is
+one exception: `offload` provides a temporary directory for the common case of
+working with a few files.
+
+The workspace is a randomly-named temporary location in the operating system's
+default temporary directory; `offload` creates a new one for each job and ensures
+it is deleted after the job ends. It can be accessed through the `OFFLOAD_WORKSPACE`
+environment variable for jobs spawned as separate processes, or `this.workspace`
+for jobs implemented as Javascript functions.
