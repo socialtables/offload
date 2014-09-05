@@ -59,6 +59,34 @@ app.permitGet(function*(next){
 module.exports = app.listen(3000);
 ```
 
+## API
+
+### app.job(jobName, action)
+
+Register a new job
+
+* jobName: the name of the job. This is used to request the job via `POST /jobs/:jobName`
+* action: this defines what should be run when the job is requested.
+  * fn(body, callback): if this is a function the body will be the body of the post.
+  * generator(body): if this is a generator, the first arg will be the body of the post.
+  * obj: if this is an object offload will spawn up a child process and the body of the post will be piped to stdin.
+    * cmd: the command to be run. eg: node
+    * args: an array of arguments to be send. eg ["index.js", "4000"]
+
+### app.stats(jobName)
+
+Get the stats for a job. Great for being used in custom reporting routes.
+
+### app.permitGet(generator)
+
+Standard KOA styled geneator that is run before all GET requests. Can be used for much more than just permission, but should be used for permission too!
+
+### app.permitPost(generator)
+
+Standard KOA styled generator that is run before all POST requets.
+
+
+
 ## Cleanup
 
 In general, `offload` jobs have to clean up after themselves -- which is to say
