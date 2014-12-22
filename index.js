@@ -21,10 +21,10 @@ module.exports = function(permitPost, permitGet){
 	 * to set up permissions for post and get
 	 */
 
-	function* noop(next){ 
+	function* noop(next){
 		debug("auto permit", this.request.method, " of ", this.request.url);
 		yield next;
-	};
+	}
 
 	/**
 	 * `config` holds all user defined bits of information for this instance
@@ -110,7 +110,7 @@ module.exports = function(permitPost, permitGet){
 		debug("starting", this.params.job);
 		var ctx = this; //doing this so we can still access it inside the catch block
 		ctx.job.stats.running++;
-		
+
 		// create a temporary dir for workspace, and
 		// push that into the child process' environment
 		var workspaceDir = path.join(os.tmpdir(), uuid.v4());
@@ -120,7 +120,7 @@ module.exports = function(permitPost, permitGet){
 		var start = Date.now();
 		try{
 			// TODO: make this work as a stream...
-			// TODO: make this less 
+			// TODO: make this less
 			var body = (yield rawBody(ctx.req)).toString();
 
 			ctx.body = yield ctx.job.fn.call(ctx, body);
@@ -166,7 +166,7 @@ module.exports = function(permitPost, permitGet){
 	 *    a job workspace is retained for debugging, in ms
 	 *	permitPost: another way to setup permissions...
 	 * 	permitGet: another way to setup permissions...
-	 *  job: regiesters a job with offload
+	 *  job: registers a job with offload
 	 * 		name: the jobs id, aka name
 	 * 		opts: //spawn
 	 *			cmd: the cmd to be run
