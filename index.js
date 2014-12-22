@@ -34,8 +34,9 @@ module.exports = function(permitPost, permitGet){
 	var config = {
 		permitPost: permitPost || noop,
 		permitGet: permitGet || permitPost || noop,
-		jobs: {}
-	}
+		jobs: {},
+		workspaceRetention: 0
+	};
 
 	/**
 	 * `checkJob` checks that the provided job id matches a job in the config object.
@@ -140,16 +141,19 @@ module.exports = function(permitPost, permitGet){
 		debug("job", ctx.params.job, "run time", time)
 		ctx.job.stats.runTime += time;
 
-		// nuke the workspace
-		rimraf(workspaceDir, function(err){
-			if(err){
-				debug("error removing workspace dir", workspaceDir);
-				emitter.emit("workspace_dir_rm_error", workspaceDir);
-			}
-			else{
-				debug("workspace dir removed", workspaceDir);
-			}
-		});
+		// nuke the workspace - after a configured period for retaining
+		// the workspace data
+		setTimeout(function() {
+			rimraf(workspaceDir, function(err){
+				if(err){
+					debug("error removing workspace dir", workspaceDir);
+					emitter.emit("workspace_dir_rm_error", workspaceDir);
+				}
+				else{
+					debug("workspace dir removed", workspaceDir);
+				}
+			});
+		}, config.workspaceRetention);
 	});
 
 	/**
@@ -158,6 +162,8 @@ module.exports = function(permitPost, permitGet){
 	 * 	get: exposes the get router
 	 * 	stats(job): provides the stats for job
 	 *	listen: binds offload to a port
+	 *  workspaceRetention: allows setting the time that
+	 *    a job workspace is retained for debugging, in ms
 	 *	permitPost: another way to setup permissions...
 	 * 	permitGet: another way to setup permissions...
 	 *  job: regiesters a job with offload
@@ -190,6 +196,10 @@ module.exports = function(permitPost, permitGet){
 		listen: function(port){
 			debug("listening on "+port);
 			return app.listen(port);
+		},
+		workspaceRetention: function(ms) {
+			debug("setting workspace retention");
+			config.workspaceRetention = ms;
 		},
 		permitPost: function(gen){
 			debug("setting permit post");
