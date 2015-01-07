@@ -100,5 +100,6 @@ for jobs implemented as Javascript functions.
 
 ## Cleanup
 
-In general, `offload` jobs have to clean up after themselves -- which is to say
-any resources used by a job should be disposed of by the job itself.
+Except for the workspace described above, `offload` jobs have to clean up after
+themselves -- which is to say any resources used by a job should be disposed of
+by the job itself.
