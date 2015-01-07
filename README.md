@@ -79,23 +79,26 @@ Get the stats for a job. Great for being used in custom reporting routes.
 
 ### app.permitGet(generator)
 
-Standard KOA styled geneator that is run before all GET requests. Can be used for much more than just permission, but should be used for permission too!
+Standard KOA styled generator that is run before all GET requests. Can be used for much more than just permission, but should be used for permission too!
 
 ### app.permitPost(generator)
 
 Standard KOA styled generator that is run before all POST requets.
 
+### app.workspaceRetention(milliseconds)
 
+Set the time to retain the job workspace directory (see below) after the job finishes. Useful mainly for debugging jobs. Defaults to 0 (i.e. no retention, workspace is deleted as soon as the job ends).
+
+## Workspace
+
+The framework provides a temporary directory for the common case of working with a few
+files -- this is a randomly-named temporary location in the operating system's
+default temporary directory. A new one is created for each job, and automatically
+deleted after the job ends. It can be accessed through the `OFFLOAD_WORKSPACE`
+environment variable for jobs spawned as separate processes, or `this.workspace`
+for jobs implemented as Javascript functions.
 
 ## Cleanup
 
 In general, `offload` jobs have to clean up after themselves -- which is to say
-any resources used by a job should be disposed of by the job itself. There is
-one exception: `offload` provides a temporary directory for the common case of
-working with a few files.
-
-The workspace is a randomly-named temporary location in the operating system's
-default temporary directory; `offload` creates a new one for each job and ensures
-it is deleted after the job ends. It can be accessed through the `OFFLOAD_WORKSPACE`
-environment variable for jobs spawned as separate processes, or `this.workspace`
-for jobs implemented as Javascript functions.
+any resources used by a job should be disposed of by the job itself.
