@@ -1,6 +1,6 @@
 {
   "name": "offload",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "description": "offload CPU intensive tasks with a POST",
   "main": "index.js",
   "dependencies": {
